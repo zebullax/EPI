@@ -3,23 +3,44 @@
 #include <iostream>
 #include <vector>
 #include <stack>
+#include <queue>
+#include <algorithm>
 
 struct treeNode
 {
     int data;
-    struct treeNode* left;
-    struct treeNode* right;
+    treeNode* left;
+    treeNode* right;
 };
 
-struct treeNode* newTreeNode(int data)
+treeNode* newTreeNode(int data)
 {
-  struct treeNode* node = (struct treeNode*) malloc(sizeof(struct treeNode));
+  treeNode* node = static_cast<treeNode*>(malloc(sizeof(treeNode)));
   node->data = data;
   node->left = NULL;
   node->right = NULL; 
   return(node);
 }
-
+treeNode* GetBigTree()
+{
+	treeNode *root = newTreeNode(314);
+	root->left = newTreeNode(6);
+	root->right = newTreeNode(6);
+	root->left->left = newTreeNode(271);
+	root->left->left->left = newTreeNode(28);
+	root->left->left->right = newTreeNode(0);
+	root->left->right = newTreeNode(561);
+	root->left->right->right = newTreeNode(3);
+	root->left->right->right->left = newTreeNode(17);
+	root->right->left = newTreeNode(2);
+	root->right->left->right = newTreeNode(1);
+	root->right->left->right->left = newTreeNode(401);
+	root->right->left->right->left->right = newTreeNode(641);
+	root->right->left->right->right = newTreeNode(257);
+	root->right->right = newTreeNode(271);
+	root->right->right->right = newTreeNode(28);
+	return root;
+}
 int getHeight(treeNode* root, bool &unbalanced)
 {	
 	if(unbalanced || !root)
@@ -35,6 +56,7 @@ int getHeight(treeNode* root, bool &unbalanced)
 	else
 		return (1+std::max(heightL,heightR));	
 }
+
 void Prob10(treeNode* root)
 {
 	bool unbalanced=false;
@@ -45,9 +67,38 @@ void Prob10(treeNode* root)
 		std::cout<<"Balanced tree";
 }
 
+void BinSum(int& sum, int val, treeNode* root)
+{
+	if (!root)
+		return;
+	val =val* 2 + (root->data);
+	if (!root->left && !root->right)
+	{
+		sum += val;
+		return;
+	}	
+	BinSum(sum, val, root->left);
+	BinSum(sum, val, root->right);	
+}
+void Prob10_6D()
+{
+	treeNode *root = newTreeNode(1);
+	root->left = newTreeNode(0);
+	//root->right = newTreeNode(1);
+	root->left->left = newTreeNode(0);
+	root->left->right = newTreeNode(1);
+	root->left->right->right = newTreeNode(1);
+	root->left->right->right->left = newTreeNode(0);
+	root->left->left->left = newTreeNode(0);
+	root->left->left->right = newTreeNode(1);
+	int sum = 0, val = 0;
+	BinSum(sum, val, root);
+	std::cout << "Sum = " << sum << std::endl;
+}
+
 void Prob10_1D()
 {
-	struct treeNode *root = newTreeNode(19);
+	treeNode *root = newTreeNode(19);
 	root->left        = newTreeNode(7);
 	root->right       = newTreeNode(43);
 	root->left->left  = newTreeNode(3);
@@ -61,7 +112,7 @@ void Prob10_1D()
 	root->right->right->right = newTreeNode(53);
 	Prob10(root);
 
-	struct treeNode *broot = newTreeNode(19);
+	treeNode *broot = newTreeNode(19);
 	broot->left        = newTreeNode(7);
 	broot->right       = newTreeNode(43);
 	broot->left->left  = newTreeNode(3);
@@ -86,10 +137,9 @@ bool IsSymm(treeNode *rootl, treeNode *rootr)
 		return false;
 	return (IsSymm(rootl->left,rootr->right)&&IsSymm(rootl->right,rootr->left));	
 }
-
 void Prob10_3D()
 {	
-	struct treeNode *symmroot = newTreeNode(314);
+	treeNode *symmroot = newTreeNode(314);
 	symmroot->left        = newTreeNode(6);
 	symmroot->right       = newTreeNode(6);
 	symmroot->left->right = newTreeNode(2); 
@@ -101,7 +151,7 @@ void Prob10_3D()
 	else
 		std::cout<<"assymmetric\n";
 
-	struct treeNode *asymmroot = newTreeNode(314);
+	treeNode *asymmroot = newTreeNode(314);
 	asymmroot->left        = newTreeNode(6);
 	asymmroot->right       = newTreeNode(6);
 	asymmroot->left->right = newTreeNode(2); 
@@ -143,7 +193,6 @@ treeNode* buildSubtreeFromPreIn(std::string pre,std::string in,int &start)
 	root->right=(idx<in.size()-1?buildSubtreeFromPreIn(pre,in.substr(idx+1,std::string::npos),start):NULL);
 	return root;
 }
-
 void IOT(treeNode* root)
 {
 	if (root==NULL)
@@ -152,7 +201,6 @@ void IOT(treeNode* root)
 	std::cout<<root->data<<",";
 	IOT(root->right);
 }
-
 void Prob10_12D()
 {
 	std::string in="621583497";
@@ -186,22 +234,7 @@ void Prob10_10(treeNode* root)
 }
 void Prob10_10D()
 {
-	struct treeNode *root = newTreeNode(314);
-	root->left        = newTreeNode(6);
-	root->right       = newTreeNode(6);
-	root->left->left  = newTreeNode(271);
-	root->left->left->left  = newTreeNode(28);
-	root->left->left->right  = newTreeNode(0);
-	root->left->right = newTreeNode(561); 
-	root->left->right->right = newTreeNode(3); 
-	root->left->right->right->left = newTreeNode(17);
-	root->right->left  = newTreeNode(2);
-	root->right->left->right  = newTreeNode(1);
-	root->right->left->right->left  = newTreeNode(401);
-	root->right->left->right->left->right  = newTreeNode(641);
-	root->right->left->right->right  = newTreeNode(257);
-	root->right->right = newTreeNode(271); 
-	root->right->right->right = newTreeNode(28);
+	treeNode *root = GetBigTree();
 	Prob10_10(root);
 }
 
@@ -222,7 +255,6 @@ treeNode* Prob10_13(const std::vector<int> &v)
 	}
 	return s.top();
 }
-
 void Prob10_13D()
 {
 	std::vector<int> preV;
@@ -232,9 +264,79 @@ void Prob10_13D()
 	IOT(r);
 }
 
+bool FindWeight(int sum, treeNode* root, int weight)
+{
+	if (!root)
+		return false;
+	sum += root->data;
+	if (sum == weight && (!root->left && !root->right))
+		return true;
+	return(FindWeight(sum, root->left, weight) || FindWeight(sum, root->right, weight));
+}
+void Prob10_7D()
+{
+	treeNode *root = GetBigTree();
+	int weight = 580;
+	if (FindWeight(0, root, weight))
+		std::cout << weight << " has been found\n";
+	else
+		std::cout << weight <<" has not been found\n";
+
+}
+
+void NonRecursivePreOrderTraversal(treeNode *root)
+{
+	if (!root)
+		return;
+	std::stack<treeNode*> s;
+	treeNode* current;
+	s.push(root);
+	while (!s.empty())
+	{
+		current = s.top();
+		s.pop();
+		std::cout << current->data << ",";
+		if (current->right)
+			s.push(current->right);
+		if (current->left)
+			s.push(current->left);
+	}
+}
+void NonRecursivePostOrderTraversal(treeNode *root)
+{
+	if (!root)
+		return;
+	std::stack<treeNode*> s;
+	std::stack<treeNode*> final;
+	treeNode* current;
+	s.push(root);
+	while (!s.empty())
+	{
+		current = s.top();
+		s.pop();
+		final.push(current);		
+		if (current->left)
+			s.push(current->left);
+		if (current->right)
+			s.push(current->right);
+	}
+	while (!final.empty())
+	{
+		current = final.top();
+		final.pop();
+		std::cout << current->data <<",";
+	}
+}
+void Prob10_9D()
+{
+	treeNode *root = GetBigTree();
+	NonRecursivePreOrderTraversal(root);
+	std::cout << std::endl;
+	NonRecursivePostOrderTraversal(root);
+}
 int main(int argc, char** argv)
 {
-	Prob10_13D();
+	Prob10_9D();
 	getchar();
 
 	return 0;
