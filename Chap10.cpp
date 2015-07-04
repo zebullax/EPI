@@ -284,6 +284,52 @@ void Prob10_7D()
 
 }
 
+void GetLeftAndRightExteriors(treeNode* l, treeNode* r, std::vector<treeNode*> &l_e, std::vector<treeNode*> &r_e)
+{
+	if (!l && !r)
+		return;
+	if (l)
+		l_e.push_back(l);
+	if (r)
+		r_e.push_back(r);
+	GetLeftAndRightExteriors(l->left, r->right, l_e, r_e);
+}
+
+void GetLeaves(treeNode* root,std::vector<treeNode*> &v)
+{
+	if (!root)
+		return;
+	if (!root->left && !root->right)
+		v.push_back(root);
+	else
+	{
+		GetLeaves(root->left, v);
+		GetLeaves(root->right, v);
+	}	
+}
+std::vector<treeNode*> GetExterior(treeNode* root)
+{
+	std::vector<treeNode*> l_e, r_e;
+	std::vector<treeNode*> leaves;
+	std::vector<treeNode*> result;
+	GetLeftAndRightExteriors(root->left, root->right, l_e, r_e);
+	GetLeaves(root, leaves);
+	result.push_back(root);
+	result.insert(result.end(),l_e.begin(), l_e.end()-1);
+	result.insert(result.end(), leaves.begin(), leaves.end());
+	std::reverse(r_e.begin(), r_e.end());
+	result.insert(result.end(), r_e.begin()+1, r_e.end());
+	return result;
+}
+void Prob10_15D()
+{
+	treeNode* root = GetBigTree();
+	std::vector<treeNode*> result = GetExterior(root);
+	for (int i = 0; i < result.size(); ++i)
+	{
+		std::cout << (result[i]->data)<<",";
+	}
+}
 void NonRecursivePreOrderTraversal(treeNode *root)
 {
 	if (!root)
@@ -336,7 +382,7 @@ void Prob10_9D()
 }
 int main(int argc, char** argv)
 {
-	Prob10_9D();
+	Prob10_15D();
 	getchar();
 
 	return 0;
