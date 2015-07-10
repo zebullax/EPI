@@ -5,6 +5,8 @@
 #include <random>
 #include <utility>
 #include <unordered_map>
+#include <unordered_set>
+#include <cassert>
 using namespace std;
 
 void Swap(vector<int> *v, int j,int k)
@@ -183,6 +185,23 @@ void Prob6_12D()
 	for (int i = 0; i < result.size(); ++i)
 		cout << result[i] << ",";
 }
+
+template<class T>
+void RandomShuffle(vector<T> &v)
+{
+	random_device rnb_init;
+	default_random_engine generator(rnb_init());
+	uniform_int_distribution<int> distrib(0, v.size()-1);
+	int n = distrib(generator);
+
+	for (int i = v.size()-1; i >=0;--i)
+	{
+		uniform_int_distribution<int>::param_type p(0, i);
+		n = distrib(generator,p) ;
+		swap(v[i], v[n]);
+	}
+}
+
 template<class T>
 void Prob6_13(vector<T> &v, vector<int> p)
 {
@@ -191,19 +210,32 @@ void Prob6_13(vector<T> &v, vector<int> p)
 		while (i != p[i])
 		{
 			std::swap(v[p[i]], v[i]);
-			std::swap(p[p[i]], p[i]);
+			swap(p[p[i]], p[i]);
 		}
 	}
 }
+
 void Prob6_13D()
 {
-	vector<int> v;
-	v.push_back(1); v.push_back(2); v.push_back(3); v.push_back(4); v.push_back(5);
-	vector<int> p;
-	p.push_back(4); p.push_back(3); p.push_back(0); p.push_back(1); p.push_back(2);
-	Prob6_13(v, p);
+	random_device rnb_init;
+	default_random_engine generator(rnb_init());
+	uniform_int_distribution<int> distrib(1, 100);
+	int n = distrib(generator);
+	vector<int> v(n), p(n), check(n);
+
+	for (int i = 0; i < n; ++i) 
+	{
+		v[i]=i;
+		p[i]=i;
+	}
+	RandomShuffle(p);
+	check = v;
+	Prob6_13(v, p);	
 	for (int i = 0; i < v.size(); ++i)
-		cout << v[i] << ",";
+	{
+		assert(v[p[i]] == check[i]);
+	}
+	cout << "Ok\n";
 }
 
 vector<int> Prob6_14(const vector<int> &vect)
@@ -263,9 +295,54 @@ void Prob6_20D()
 	for (int i = 0; i < t.size(); ++i)
 		cout << t[i] << "=" << samples[t[i]] << endl;
 }
+bool Prob6_21(vector<vector<int> >v)
+{
+	vector<unordered_set<int> > rows(9, unordered_set<int>()), cols(9, unordered_set<int>()), squares(9, unordered_set<int>());
+	
+	for (int r = 0; r < 9; ++r)
+	{
+		for (int c = 0; c < 9; ++c)
+		{
+			if (v[r][c] != 0)
+			{
+				if (rows[r].find(v[r][c]) == rows[r].end())
+					rows[r].insert(v[r][c]);
+				else
+					return false;
+
+				if (cols[c].find(v[r][c]) == cols[c].end())
+					cols[c].insert(v[r][c]);
+				else
+					return false;
+				int sq_idx = 3 * (r / 3) + c / 3;
+				if (squares[sq_idx].find(v[r][c]) == squares[sq_idx].end())
+					squares[sq_idx].insert(v[r][c]);
+				else
+					return false;
+			}
+		}
+	}
+	return true;
+}
+void Prob6_21D()
+{
+	vector<vector<int> >v(9, vector<int>(9,0));
+	v[0][0] = 5;	v[0][1] = 3;	v[0][2] = 0;	v[0][3] = 0;	v[0][4] = 7;	v[0][5] = 0;	v[0][6] = 0;	v[0][7] = 0;	v[0][8] = 0;
+	v[1][0] = 6;	v[1][1] = 0;	v[1][2] = 0;	v[1][3] = 1;	v[1][4] = 9;	v[1][5] = 5;	v[1][6] = 0;	v[1][7] = 0;	v[1][8] = 0;
+	v[2][0] = 0;	v[2][1] = 9;	v[2][2] = 8;	v[2][3] = 0;	v[2][4] = 0;	v[2][5] = 0;	v[2][6] = 0;	v[2][7] = 6;	v[2][8] = 0;
+	v[3][0] = 8;	v[3][1] = 0;	v[3][2] = 0;	v[3][3] = 0;	v[3][4] = 6;	v[3][5] = 0;	v[3][6] = 0;	v[3][7] = 0;	v[3][8] = 3;
+	v[4][0] = 4;	v[4][1] = 0;	v[4][2] = 0;	v[4][3] = 8;	v[4][4] = 0;	v[4][5] = 3;	v[4][6] = 0;	v[4][7] = 0;	v[4][8] = 1;
+	v[5][0] = 7;	v[5][1] = 0;	v[5][2] = 0;	v[5][3] = 0;	v[5][4] = 2;	v[5][5] = 0;	v[5][6] = 0;	v[5][7] = 0;	v[5][8] = 6;
+	v[6][0] = 0;	v[6][1] = 6;	v[6][2] = 0;	v[6][3] = 0;	v[6][4] = 0;	v[6][5] = 0;	v[6][6] = 2;	v[6][7] = 8;	v[6][8] = 0;
+	v[7][0] = 0;	v[7][1] = 0;	v[7][2] = 0;	v[7][3] = 4;	v[7][4] = 1;	v[7][5] = 9;	v[7][6] = 0;	v[7][7] = 0;	v[7][8] = 5;
+	v[8][0] = 0;	v[8][1] = 0;	v[8][2] = 0;	v[8][3] = 0;	v[8][4] = 8;	v[8][5] = 0;	v[8][6] = 0;	v[8][7] = 7;	v[8][8] = 9;
+	cout << Prob6_21(v)<<endl;
+	v[1][3] = 4;
+	cout << Prob6_21(v)<<endl;
+}
 int main(int argc,char** argv)
 {
-	Prob6_20D();
-	getchar();
+	Prob6_13D();
+	getchar();  
 	return 0;
 }
