@@ -91,8 +91,62 @@ void Prob7_04D() {
 	Prob7_04(s);
 	cout << s << endl;
 }
+
+string Prob7_06(int n) {
+	if (n == 1)
+		return ("11");
+	string s("1"), r("11");
+	
+	for (int j = 1; j < n; ++j) {
+		s = r;r.clear();
+		for (int i = 0; i < s.size(); ++i) {
+			int nb = 1;
+			while (i + 1 < s.size() && s[i] == s[i + 1]) {
+				nb++;
+				i++;
+			}
+			r += to_string(nb) + s[i];
+		}
+	}
+	return r;
+}
+string RLE_Encoding(string s) {
+	string res;
+	unsigned int nb = 1;
+	for (int i = 0; i < s.size(); ++i) {
+		while (i + 1<s.size() && s[i] == s[i + 1]) {
+			nb++;
+			i++;
+		}
+		res.push_back('0' + nb);
+		res.push_back(s[i]);
+		nb = 1;
+	}
+	return res;
+}
+string RLE_Decoding(string s) {
+	string res;
+	char c;
+	unsigned int nb;
+	for (int i = 0; i < s.size(); ++i) {
+		nb = s[i++]-'0';
+		c = s[i];
+		res.insert(res.end(), nb, c);		
+	}
+	return res;
+}
+void Prob7_10D() {
+	string s("aaaabcccaa");
+	string encoded_s = RLE_Encoding(s);
+	string decoded_s = RLE_Decoding(encoded_s);
+	assert(decoded_s == s);
+}
+void Prob7_06D() {
+	int n = 7;
+	string result = Prob7_06(8);
+}
 int main(int argc,char**argv) {
-	Prob7_04D();
+	Prob7_10D();
 	getchar();
 	return 0;
 }
