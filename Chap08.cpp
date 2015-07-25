@@ -86,7 +86,7 @@ node* reverseList(node *h)
 	return p;
 }
 
-void Test8_1D()
+void Prob8_1D()
 {
 	node* L=newNode(2);
 	L->next=newNode(3);
@@ -128,7 +128,7 @@ void Test8_1D()
 
 
 
-void Test8_2D()
+void Prob8_2D()
 {
 	node* L;
 	L=newNode(2);
@@ -145,7 +145,7 @@ void Test8_2D()
 		cout<<"No cycle\n";	
 }
 
-void Test8_5D()
+void Prob8_5D()
 {
 	node* L=newNode(2);
 	L->next=newNode(3);
@@ -176,7 +176,7 @@ void Test8_5D()
 	}
 	cout<<s->data<<" is the beginning of the cycle";
 }
-void Test8_4(node* _L, node* _R)
+void Prob8_4(node* _L, node* _R)
 {
 	node* L=_L;
 	node* R=_R;
@@ -195,7 +195,7 @@ void Test8_4(node* _L, node* _R)
 	}
 	cout<<"No overlap\n";
 }
-void Test8_4D()
+void Prob8_4D()
 {
 	node* L=newNode(2);
 	node *R=newNode(3);
@@ -207,9 +207,9 @@ void Test8_4D()
 	R->next=newNode(7);
 	R->next->next=newNode(8);
 	R->next->next->next=L->next;
-	Test8_4(L,R);
+	Prob8_4(L,R);
 }
-node* Test8_6(node* L)
+node* Prob8_6(node* L)
 {
 	if(!L)
 		return NULL;
@@ -232,7 +232,7 @@ node* Test8_6(node* L)
 	odd->next=eH;
 	return oH;
 }
-void Test8_6D()
+void Prob8_6D()
 {
 	node* L=newNode(1);	
 	L->next=newNode(2);
@@ -241,7 +241,7 @@ void Test8_6D()
 	L->next->next->next->next=newNode(5);
 	L->next->next->next->next->next=newNode(6);
 	L->next->next->next->next->next->next=newNode(7);
-	L=Test8_6(L);
+	L=Prob8_6(L);
 	while(L)
 	{
 		cout<<L->data<<" ";
@@ -249,7 +249,7 @@ void Test8_6D()
 	}
 }
 
-void Test8_9D()
+void Prob8_9D()
 {
 	node* L=newNode(2);
 	L->next=newNode(3);
@@ -261,7 +261,7 @@ void Test8_9D()
 	printList(L);
 }
 
-void Test8_10D()
+void Prob8_10D()
 {
 	node* L=newNode(2);
 	L->next=newNode(3);
@@ -287,8 +287,44 @@ void Test8_10D()
 	cout<<"Palindrome\n";
 }
 
+node* Prob8_03(node *L, int s, int e) {
+	if (!L || s >= e || s < 1) return L;
+	node *p = nullptr, *c = L, *n = c->next;
+	int node_count = 1;
+	while (node_count<s && c) {		
+		p = c;
+		c = n;
+		n = c->next;
+		node_count++;
+	}
+	node* h = p , *t=c;
+	c->next = nullptr;
+
+	while (node_count<e && c) {
+		node *tmp = n->next;
+		n->next = c;		
+		c = n;
+		n = tmp;
+		node_count++;
+	}
+	t->next = n;
+	h->next = c;
+	return L;
+}
+void Prob8_03D() {
+	node* L = newNode(1);
+	L->next = newNode(2);
+	L->next->next = newNode(3);
+	L->next->next->next = newNode(4);
+	L->next->next->next->next = newNode(5);
+	L->next->next->next->next->next = newNode(6);
+	L->next->next->next->next->next->next = newNode(7);
+	L = Prob8_03(L, 2, 5);
+	printList(L);
+	deleteList(L);
+}
 int main(int argc, char** argv)
 {
-	Test8_2D();
+	Prob8_03D();
 	getchar();
 }

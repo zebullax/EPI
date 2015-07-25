@@ -145,8 +145,50 @@ void Prob7_06D() {
 	int n = 7;
 	string result = Prob7_06(8);
 }
+
+vector<int> BuildFFwdTable(const string& s){
+	int matched_chars = 0;
+	vector<int> v(s.size());
+	v[0] = matched_chars;
+
+	for (int i = 1; i<s.size(); ++i){
+		while (matched_chars>0 && s[matched_chars] != s[i])
+			matched_chars = v[matched_chars];
+		if (s[matched_chars] == s[i])
+			matched_chars++;
+		v[i] = matched_chars;
+	}
+	return v;
+}
+
+vector<int> KMPMatcher(const string &p, const string &t){
+	vector<int> skip(BuildFFwdTable(p));
+	int matched_chars = 0;
+	vector<int> res;
+
+	for (int i = 0; i<t.size(); ++i){
+		while (matched_chars>0 && p[matched_chars] != t[i])
+			matched_chars = skip[matched_chars-1];
+		if (p[matched_chars] == t[i])
+			matched_chars++;
+		if (matched_chars == p.size()){
+			res.push_back(i - p.size() + 1);
+			matched_chars = skip[matched_chars-1];
+		}
+	}
+	return res;
+}
+
+void KMPMatcher_D() {
+	string text("ABC ABCDAB ABCDABCDABDEABCDABD");
+	string pattern("ABCDABD");
+	vector<int> hits(KMPMatcher(pattern, text));
+	for (const int &pos : hits)
+		cout << pos << ",";
+}
+
 int main(int argc,char**argv) {
-	Prob7_10D();
+	KMPMatcher_D();
 	getchar();
 	return 0;
 }

@@ -1,10 +1,9 @@
 #include <vector>
 #include <utility>
 #include <iostream>
-#include <string>
+#include <random>
 #include <queue>
 #include <functional>
-#include <cstdlib>
 #include <cmath>
 
 using namespace std;
@@ -191,9 +190,72 @@ void Prob11_5D()
 	v.push_back(5);v.push_back( 15);v.push_back( 1);v.push_back( 3);v.push_back( 2);v.push_back( 8);v.push_back( 7);v.push_back( 9);v.push_back( 10);v.push_back( 6);v.push_back( 11);v.push_back( 4);
 	Prob11_5(v);
 }
+
+vector<int> Prob11_7(const vector<int> &v) {
+	
+	if (v.size() == 1)
+		return{ 1 };
+
+	vector<int> res(v.size());
+	int w_idx = 0,r_idx=1;
+	vector<int> nb_ticket; 	
+	bool is_increasing = v[1]>v[0];
+	
+	nb_ticket.push_back(nb_ticket.size() + 1);
+	while (r_idx<v.size() - 1) {	
+		if (is_increasing && v[r_idx]>v[r_idx + 1] || !is_increasing && v[r_idx] < v[r_idx + 1]) {
+			nb_ticket.push_back(nb_ticket.size() + 1);
+			if (is_increasing && v[r_idx]>v[r_idx + 1])
+				copy(nb_ticket.begin(), nb_ticket.end(), res.begin() + w_idx);
+			else if (!is_increasing && v[r_idx] < v[r_idx + 1])
+				reverse_copy(nb_ticket.begin(), nb_ticket.end(), res.begin() + w_idx);
+			is_increasing = !is_increasing;
+			nb_ticket.clear();
+			w_idx = r_idx;
+		}
+		nb_ticket.push_back(nb_ticket.size() + 1);
+		r_idx++;
+	}
+	nb_ticket.push_back(nb_ticket.size() + 1);
+	if (is_increasing)
+		copy(nb_ticket.begin(), nb_ticket.end(), res.begin() + w_idx);
+	else
+		reverse_copy(nb_ticket.begin(), nb_ticket.end(), res.begin() + w_idx);
+	return res;
+}
+
+void Prob11_7D() {
+	vector<int> v;
+	v.push_back(2); v.push_back(6); v.push_back(5); v.push_back(3); v.push_back(4); v.push_back(5); v.push_back(4); v.push_back(2);
+	vector<int> res = Prob11_7(v);
+}
+
+int Partition(vector<int> &v, int start, int end){
+	random_device rnb_init;
+	default_random_engine generator(rnb_init());
+	uniform_int_distribution<int> distrib(start, --end);
+
+	int p_idx = distrib(generator);
+	int p_val = v[p_idx];
+	swap(v[p_idx], v[end]);
+
+	int low = 0, high = end - 1;
+	while (low <= high){
+		if (v[low]<p_val)
+			low++;
+		else if (v[low] >= p_val)
+			swap(v[low], v[high--]);
+	}
+	swap(v[low], v[end]);
+	return low;
+}
+void TestPartition() {
+	vector<int> v{ 12, 7, 9, 3, 5 };
+	int idx = Partition(v, 0, v.size());
+}
 int main(int argc,char **argv)
 {
-	Prob11_5D();
+	TestPartition();
 	getchar();
 }
 

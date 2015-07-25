@@ -1,8 +1,8 @@
 ﻿#include <vector>
 #include <functional>
 #include <iostream>
-#include <cstdlib>
-#include <limits>
+#include <sstream>
+#include <cassert>
 #include <algorithm>
 #include <unordered_map>
 #include <unordered_set>
@@ -11,6 +11,58 @@
 #include<queue>
 using namespace std;
 
+pair<int, int> Prob13_10(const vector<string> &Q, const vector<string> &A) {
+	pair<int, int> min_idx(-1, -1);
+	int l = -1, r = 0;
+	int next_match = 0;
+
+	while (r != A.size()) {
+		while (r != A.size() && next_match < Q.size()) {
+			bool reduce_left = (Q.size() > 1 && next_match == 1 && A[r] == Q[0]);
+			if (A[r] == Q[next_match] ||reduce_left) {
+				if (next_match==0 || reduce_left)
+					l = r;
+				if (!reduce_left)
+					next_match++;
+			}
+			r++;
+		}
+		if (next_match==Q.size()&&(min_idx.first == -1 || r -1- l < min_idx.second - min_idx.first))
+			min_idx = make_pair(l, r - 1);
+		next_match = 0;
+		l = r;
+	}
+	return min_idx;
+}
+void Prob13_10D() {
+	
+	string declaration("My paramount object in this struggle is to save the Union , and is not either to save or to destroy slavery . If I could save the Union without freeing any slave I would do it , and if I could save it by freeing all the slaves I would do it ; and if I could save it by freeing some and leaving others alone I would also do that");
+	string buf; 
+	stringstream ss(declaration); 
+	vector<string> A,Q; 
+	while (ss >> buf)
+		A.push_back(buf);	
+
+	Q.push_back("Union"); Q.push_back("save");
+	pair<int, int> min = Prob13_10(Q, A);
+	assert(min.first == 10 && min.second == 17);
+	A.clear(); Q.clear();
+	A.push_back("a"); A.push_back("a"); A.push_back("a"); A.push_back("a"); A.push_back("b"); A.push_back("c");
+	Q.push_back("a"); Q.push_back("c");
+	min = Prob13_10(Q, A);
+	assert(min.first == 3 && min.second == 5);
+	A.clear(); Q.clear();
+	A.push_back("a"); A.push_back("a"); A.push_back("a"); A.push_back("b"); A.push_back("a");  A.push_back("b"); A.push_back("c");
+	Q.push_back("a"); Q.push_back("c");
+	min = Prob13_10(Q, A);
+	assert(min.first == 4 && min.second == 6);
+	
+	Q = { "0", "2", "9", "4", "6" };
+	A = { "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "2", "4", "6", "10", "10", "10", "3", "2", "1", "0" };
+	min = Prob13_10(Q, A);
+	assert(min.first == 0 && min.second == 12);
+	min = Prob13_10(Q, A);
+}
 vector<vector<string> > Prob13_1(const vector<string> &d)
 {
 	unordered_map<string,vector<string> > ana;
@@ -26,6 +78,82 @@ vector<vector<string> > Prob13_1(const vector<string> &d)
     for(unordered_map<string,vector<string> >::iterator it=ana.begin();it!=ana.end();++it)
         ret.push_back(it->second);
     return ret;
+}
+pair<int, int> Prob13_11(const vector<int> &v) {
+	list<pair<int, int>> l; // <nb,idx>
+	pair<int, int> idx(0, 0);
+	unordered_set<int> dic;
+	for (int i = 0; i < v.size(); ++i) {
+		unordered_set<int>::iterator it = dic.find(v[i]);
+		if (it != dic.end()) {
+			while (!l.empty() && l.front().first != v[i]) {
+				dic.erase(dic.find(l.front().first));
+				l.pop_front();
+			}
+			dic.erase(it);
+			l.pop_front();
+			it = dic.find(v[i]);
+		}		
+		if (it == dic.end()) {
+			dic.insert(v[i]);
+			l.push_back(make_pair(v[i], i));
+			if (l.back().second - l.front().second > idx.second - idx.first)
+				idx=make_pair(l.front().second, l.back().second);
+		}
+	}
+	return idx;
+}
+void Prob13_11D() {
+	vector<int>v;
+	v.push_back(5); v.push_back(7); v.push_back(5); v.push_back(11); v.push_back(13); v.push_back(2); v.push_back(11); v.push_back(19); v.push_back(2); v.push_back(11);
+	pair<int, int> p(Prob13_11(v));
+	assert(p.first == 1 && p.second == 5);
+}
+
+vector<string> Prob13_13(const string &s, const vector<string> &l) {
+	vector<string> results;
+	string current_match;
+	unordered_set<string> dico(l.begin(),l.end());
+	unordered_set<string> already_matched;
+	int len = l.front().size();
+	int started_matching = -1;
+	int i = 0;
+	while (i <= s.size() - len) {
+		while (i <= s.size() - len && already_matched.size() != l.size()) {
+			string cur_substr(s.substr(i, len));
+			if (dico.find(cur_substr) != dico.end() && already_matched.find(cur_substr) == already_matched.end()) {
+				if (already_matched.size() == 0)
+					started_matching = i;
+				current_match += cur_substr;
+				already_matched.insert(cur_substr);
+				i += len;			
+			}else {
+				if (already_matched.size() != 0)
+				{
+					i = started_matching + 1;
+					already_matched.clear();
+					current_match = "";
+				}
+				else
+					i++;
+			}
+		}
+		if (already_matched.size() == l.size()){
+			results.push_back(current_match);
+			current_match = "";
+			already_matched.clear();
+		}
+	}
+	return results;
+}
+void Prob13_13D() {
+	string s("amanaplanacanal");
+	vector<string> l;
+	l.push_back("can"); l.push_back("apl"); l.push_back("ana");
+	vector<string> results(Prob13_13(s, l));
+	for (const string& s:results) 
+		cout << s << ",";
+	
 }
 void Prob13_1D()
 {
@@ -363,8 +491,50 @@ void Prob13_12D()
 	pair<int,int> res=Prob13_12(s);
 	cout<<res.first<<" "<<res.second<<endl;
 }
+
+struct compareFreqQueries
+{
+	bool operator()(const pair<string, int> &left, const pair<string, int> &right){
+		return (left.second > right.second);
+	}
+};
+
+vector<string> Prob13_6(const vector<string> &v, int k) {
+	priority_queue<pair<string, int>, vector<pair<string, int> >, compareFreqQueries > min_q;
+	unordered_map<string, int> h_tbl;
+	for (vector<string>::const_iterator it = v.begin(); it != v.end(); ++it) {
+		h_tbl[*it]++;
+	}
+	for (unordered_map<string, int>::iterator it = h_tbl.begin(); it != h_tbl.end(); ++it) {
+		pair<string, int> tmp(it->first, it->second);
+		if (min_q.size() < k)
+			min_q.push(tmp);
+		else if (it->second > min_q.top().second) {
+			min_q.pop();
+			min_q.push(tmp);
+		}
+	}
+	vector<string> result;
+	while (!min_q.empty()) {
+		result.push_back(min_q.top().first);
+		min_q.pop();
+	}
+	return result;
+}
+void Prob13_6D() {
+	vector<string> v;
+	v.push_back("mohito"); v.push_back("mohito"); v.push_back("mohito"); v.push_back("mohito"); v.push_back("mohito");
+	v.push_back("cuba libre"); v.push_back("cuba libre"); v.push_back("cuba libre"); v.push_back("cuba libre");
+	v.push_back("rum"); v.push_back("rum"); v.push_back("rum");
+	v.push_back("gin"); v.push_back("beer"); v.push_back("calori mate");
+	vector<string> result = Prob13_6(v, 1);
+	for (const string &s : result) {
+		cout << s << endl;
+	}
+}
+
 int main(int argc, char **argv)
 {
-    Prob13_12D();
+	Prob13_10D();
     getchar();
 }
