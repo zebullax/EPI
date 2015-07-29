@@ -533,8 +533,40 @@ void Prob13_6D() {
 	}
 }
 
+bool TestCollatzConjectureHelper(unordered_set<int> &inspected, size_t n) {
+	
+	while (inspected.find(n) == inspected.end()) {
+		inspected.insert(n);
+		if (n % 2)
+			n = n * 3 + 1;
+		else
+			n /= 2;
+		if (n == 1)
+			return true;
+	}
+	return false;
+}
+
+bool TestCollatzConjecture(const int n) {
+	unordered_set<int> confirmed, inspected;
+
+	for (size_t i = 1; i < n;++i) {
+		if (confirmed.find(i) == confirmed.end()){
+			bool pass = TestCollatzConjectureHelper(inspected, i);
+			if (!pass)
+				return false;
+			confirmed.insert(inspected.begin(), inspected.end());
+			inspected.clear();
+		}
+	}
+	return true;
+}
+void Prob13_16D() {
+	int n = 50;
+	assert(TestCollatzConjecture(100));
+}
 int main(int argc, char **argv)
 {
-	Prob13_10D();
+	Prob13_16D();
     getchar();
 }
