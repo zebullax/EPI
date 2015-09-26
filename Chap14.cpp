@@ -1,13 +1,8 @@
 #include <vector>
-#include <functional>
 #include <iostream>
 #include <cstdlib>
 #include <limits>
 #include <algorithm>
-#include <unordered_map>
-#include <unordered_set>
-#include <map>
-#include <string>
 #include<queue>
 using namespace std;
 
@@ -17,6 +12,8 @@ struct calendarEvent{
 	calendarEvent(unsigned int b,unsigned int e):begin(b),end(e){}
 	bool operator<(const calendarEvent& that){return (this->begin<that.begin);}
 };
+
+
 int Prob14_5(const vector<calendarEvent> &v)
 {
 	vector<calendarEvent> cal=v;
@@ -162,9 +159,47 @@ void Prob14_12D()
 	}
 }
 
+struct Interval
+{
+	unsigned int left, right;
+	Interval(int l, int r) :left(l), right(r){}
+	bool operator<(const Interval &that){return this->left < that.left;}
+};
+bool Intersect(Interval &a, const Interval &b) {
+	if (min(a.right, b.right) < max(a.left, b.left))
+		return false; //empty intersection
+	a.left = max(a.left, b.left);
+	a.right= min(a.right, b.right);
+	return true;
+}
+vector<int> Prob14_8(vector<Interval> v) {
+	vector<int> result;
+	sort(v.begin(), v.end());
+	int i = 0;
+	while (i != v.size()) {
+		Interval in = v[i];
+		while (i != v.size() && Intersect(in, v[i]))
+			++i;
+		result.push_back(in.left);
+	}
+	return result;
+}
+
+void Prob14_8D() {
+	vector<Interval> tasks;
+	tasks.push_back(Interval(0, 3)); tasks.push_back(Interval(2, 4)); 
+	tasks.push_back(Interval(3, 4)); tasks.push_back(Interval(1, 1));
+	tasks.push_back(Interval(5, 7)); tasks.push_back(Interval(7, 8)); 
+	tasks.push_back(Interval(8, 11)); tasks.push_back(Interval(9, 11));
+	tasks.push_back(Interval(12, 14)); tasks.push_back(Interval(12, 16)); 
+	tasks.push_back(Interval(13, 13)); tasks.push_back(Interval(16, 17));
+	vector<int> results(Prob14_8(tasks));
+	for (const int &v : results)
+		cout << v << " ";
+}
 int main(int argc,char**argv)
 {
-	Prob14_12D();
+	Prob14_8D();
 	getchar();
 
 	return 0;
